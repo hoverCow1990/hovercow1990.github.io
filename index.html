@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="applicable-device" content="pc,mobile">
+<title>远征体力工具</title>
+<style>
+  * {
+    padding: 0;
+    margin: 0;
+  }
+
+  html {
+    list-style-type:none;
+  }
+
+  #app {
+    padding: 16px;
+    font-size: 14px;
+  }
+
+  .input-list {
+    width: 100%;
+    max-width: 800px;
+  }
+  .input-list li {
+    display: flex;
+    height: 30px;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 10px;
+  }
+
+  .input-list li span {
+    display: flex;
+    width: 55px;
+  }
+
+  .input-list li input{
+    height: 30px;
+    margin-left: 10px;
+    flex: 1;
+    border: 1px solid #cecece;
+    border-radius: 3px;
+    text-indent: 5px;
+  }
+
+  .btn {
+    width: 100%;
+    max-width: 800px;
+    height: 36px;
+    margin-top: 10px;
+    background: #5295ef;
+    color: #fff;
+    text-align: center;
+    line-height: 36px;
+    border-radius: 3px;
+    cursor: pointer;
+  }
+
+  .msg {
+   padding-top: 10px;
+   color: #444;
+  }
+
+  .msg  {
+    padding-bottom: 6px;
+  }
+
+  .msg .red {
+    color: #ee4141;
+    font-weight:bold;
+  }
+
+</style>
+</head>
+<body>
+  <div id="app">
+    <ul class="input-list">
+      <li><span>英雄一  :</span><input class="power-input" type="tel" /></li>
+      <li><span>英雄二 :</span> <input class="power-input" type="tel" /></li>
+      <li><span>英雄三 :</span> <input class="power-input" type="tel" /></li>
+      <li><span>英雄四 :</span> <input class="power-input" type="tel" /></li>
+      <li><span>英雄五 :</span> <input class="power-input" type="tel" /></li>
+      <li><span>单次伤害(亿) :</span> <input class="damage-input" type="tel" value="10"/></li>
+    </ul>
+    <div class="btn" >查询</div>
+    <div class="msg"></div>
+  </div>
+<script type="text/javascript">
+var endTimeConfig = '2020-10-18 08:00:00';
+
+
+var btn = document.querySelector('.btn');
+var inputList = Array.prototype.slice.call(document.querySelectorAll('.power-input'));
+var msgDom = document.querySelector('.msg');
+var damageDom = document.querySelector('.damage-input');
+
+function getCount(minPower, powerAdd) {
+  return Math.floor((minPower + powerAdd) / 48);
+}
+
+function getRe(minPower, powerAdd) {
+  var count = getCount(minPower, powerAdd);
+  var mins = (minPower + powerAdd) - (count * 48);
+
+  return Math.floor(mins / 4);
+}
+
+function getDamage (minPower, powerAdd, damageDom) {
+  var count = getCount(minPower, powerAdd);
+  
+  return count * Number(damageDom);
+}
+
+
+btn.addEventListener('click', function () {
+  var msg = '';
+  var now = new Date().getTime();
+  var endTime = new Date(endTimeConfig).getTime();
+
+  var minusHour = Math.floor((endTime - now) / 1000 / 60 / 60);
+  var powerAdd = minusHour * 4;
+  var minPower = 5001;
+  var damage = damageDom.value;
+
+  inputList.forEach(function(input, index) {
+    var value = input.value;
+    var num =  Number(value);
+
+    if (!/^\d+$/.test(value)) {
+      msg += '<p class="red">英雄' + (index + 1) + '体力不正确</p>';
+
+      return;
+    }
+
+    if (num > 5000) {
+      msg += '<p class="red">英雄' + (index + 1) + '体力太多了</p>';
+
+      return;
+    }
+
+    if (num < minPower) minPower = num;
+  })
+
+  if (!/^\d+$/.test(damage)) {
+     msg += '<p class="red">单次伤害填写数据不对</p>';
+  }
+
+  if (damage > 200) {
+    alert('你有病, 打这么多咋不上天呢');
+    return;
+  }
+
+  if (msg === '') {
+    msg += '<p>目前该队还能打<span class="red">' + getCount(minPower, powerAdd) + '次</span></p>';
+    msg += '<p>最多可re <span class="red">' + getRe(minPower, powerAdd) + '</span>次</p>';
+    msg += '<p>约造成 <span class="red">' + getDamage(minPower, powerAdd, damage) + '亿</span></p>';
+  }
+
+  msgDom.innerHTML = msg;
+})
+
+
+
+</script>
+</body>
+</html>
